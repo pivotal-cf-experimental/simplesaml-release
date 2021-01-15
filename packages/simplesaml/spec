@@ -1,0 +1,7 @@
+---
+name: simplesaml
+
+dependencies: []
+
+files:
+- simplesamlphp-for-cf/**/*

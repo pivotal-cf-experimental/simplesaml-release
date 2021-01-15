@@ -1,0 +1,34 @@
+#!/bin/bash
+
+RUN_DIR=/var/vcap/sys/run/simplesaml
+LOG_DIR=/var/vcap/sys/log/simplesaml
+PIDFILE_HTTP=${RUN_DIR}/pid_http
+
+if [[ `which php` ]]; then
+    echo 'PHP is already installed'
+else
+    apt-get update
+    apt-get install php -y
+fi
+
+case $1 in
+
+  start)
+    cp /var/vcap/jobs/simplesaml/metadata/saml20-sp-remote.php /var/vcap/packages/simplesaml/metadata/saml20-sp-remote.php
+    mkdir -p $RUN_DIR $LOG_DIR
+    chown -R vcap:vcap $RUN_DIR $LOG_DIR
+
+    php -S 0.0.0.0:80 -t /var/vcap/packages/simplesaml/www &
+    echo $! > $PIDFILE_HTTP
+    ;;
+
+  stop)
+    kill `cat $PIDFILE_HTTP`
+    rm -f $PIDFILE_HTTP
+
+    ;;
+
+  *)
+    echo "Usage: ctl {start|stop}" ;;
+
+esac

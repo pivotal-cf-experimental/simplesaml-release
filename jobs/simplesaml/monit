@@ -1,0 +1,5 @@
+check process simplesaml
+  with pidfile /var/vcap/sys/run/simplesaml/pid_http
+  start program "/var/vcap/jobs/simplesaml/bin/ctl start"
+  stop program "/var/vcap/jobs/simplesaml/bin/ctl stop"
+  group vcap

@@ -1,0 +1,14 @@
+---
+name: simplesaml
+
+templates:
+    ctl.erb: bin/ctl
+    saml20-sp-remote.php.erb: metadata/saml20-sp-remote.php
+
+packages:
+- simplesaml
+
+properties:
+    permitted_client_ip_addresses:
+        description: IP adddresses to allow to connect with the SAML server
+        default: []

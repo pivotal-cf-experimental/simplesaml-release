@@ -1,0 +1,3 @@
+set -e
+
+cp -r simplesamlphp-for-cf/* ${BOSH_INSTALL_TARGET}
