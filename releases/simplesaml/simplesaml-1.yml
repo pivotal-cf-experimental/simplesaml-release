@@ -1,0 +1,17 @@
+name: simplesaml
+version: "1"
+commit_hash: 2b6e310
+uncommitted_changes: true
+jobs:
+- name: simplesaml
+  version: 06582109cc7249798249f0ed311a828544804ae47683bcdc28f76ff645ee316b
+  fingerprint: 06582109cc7249798249f0ed311a828544804ae47683bcdc28f76ff645ee316b
+  sha1: sha256:c70c5281b74731625f2e81b56a2d506df5f6c44868298bc21f830fcb6c4b608a
+  packages:
+  - simplesaml
+packages:
+- name: simplesaml
+  version: 5e7d8a9957444f03e488d415610533cbb823437ceb77f402cc8522ac9229f944
+  fingerprint: 5e7d8a9957444f03e488d415610533cbb823437ceb77f402cc8522ac9229f944
+  sha1: sha256:dda7a2906c71b1c6d710e177e591b59cc658d75b79265e67aa8b417adfaba401
+  dependencies: []
