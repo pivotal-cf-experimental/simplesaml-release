@@ -1,1 +1,6 @@
 name: simplesaml
+blobstore:
+  provider: s3
+  options:
+    bucket_name: simplesaml-bosh-release
+    region: us-west-1
