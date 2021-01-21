@@ -1,9 +1,9 @@
 <?php
 
 <% p('permitted_client_ip_addresses').each do |ip_address| %>
-    $metadata['https://<%= ip_address %>'] = array(
-        'AssertionConsumerService' => 'https://<%= ip_address %>/saml/SSO/alias/<%= ip_address %>',
-        'SingleLogoutService' => 'https://<%= ip_address %>/saml/SSO/alias/<%= ip_address %>',
+    $metadata['https://<%= ip_address %>:443/uaa'] = array(
+        'AssertionConsumerService' => 'https://<%= ip_address %>:443/uaa/saml/SSO/alias/<%= ip_address %>',
+        'SingleLogoutService' => 'https://<%= ip_address %>:443/uaa/saml/SSO/alias/<%= ip_address %>',
         'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
         'simplesaml.nameidattribute' => 'emailAddress',
     );
