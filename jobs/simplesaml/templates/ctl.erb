@@ -8,7 +8,7 @@ if [[ `which php` ]]; then
     echo 'PHP is already installed'
 else
     apt-get update
-    apt-get install php -y
+    apt-get install php php-xml php-curl php-gmp -y
 fi
 
 case $1 in
@@ -18,7 +18,7 @@ case $1 in
     mkdir -p $RUN_DIR $LOG_DIR
     chown -R vcap:vcap $RUN_DIR $LOG_DIR
 
-    php -S 0.0.0.0:80 -t /var/vcap/packages/simplesaml/www &
+    php -S 0.0.0.0:80 -t /var/vcap/packages/simplesaml/www -c /var/vcap/jobs/simplesaml/php.ini &
     echo $! > $PIDFILE_HTTP
     ;;
 

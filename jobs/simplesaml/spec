@@ -3,6 +3,7 @@ name: simplesaml
 
 templates:
     ctl.erb: bin/ctl
+    php.ini.erb: php.ini
     saml20-sp-remote.php.erb: metadata/saml20-sp-remote.php
 
 packages:
