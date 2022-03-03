@@ -3,29 +3,46 @@
 RUN_DIR=/var/vcap/sys/run/simplesaml
 LOG_DIR=/var/vcap/sys/log/simplesaml
 PIDFILE_HTTP=${RUN_DIR}/pid_http
+CTL_LOG="${LOG_DIR}/ctl.log"
+PHP_LOG="${LOG_DIR}/php.log"
 
 if [[ `which php` ]]; then
-    echo 'PHP is already installed'
+    echo 'PHP is already installed' >> $CTL_LOG
 else
-    apt-get update
-    apt-get install php php-xml php-curl php-gmp -y
+    apt-get update 2>&1 >> $CTL_LOG
+    apt-get install php php-xml php-curl php-gmp -y 2>&1 >> $CTL_LOG
 fi
 
 case $1 in
 
   start)
-    cp /var/vcap/jobs/simplesaml/metadata/saml20-sp-remote.php /var/vcap/packages/simplesaml/metadata/saml20-sp-remote.php
+    cp /var/vcap/jobs/simplesaml/metadata/saml20-sp-remote.php \
+      /var/vcap/packages/simplesaml/metadata/saml20-sp-remote.php
     mkdir -p $RUN_DIR $LOG_DIR
     chown -R vcap:vcap $RUN_DIR $LOG_DIR
 
-    php -S 0.0.0.0:80 -t /var/vcap/packages/simplesaml/www -c /var/vcap/jobs/simplesaml/php.ini &
-    echo $! > $PIDFILE_HTTP
+    php -S 0.0.0.0:80 \
+      -t /var/vcap/packages/simplesaml/www \
+      -c /var/vcap/jobs/simplesaml/php.ini \
+      2>&1 >> $PHP_LOG &
+    php_pid="$!"
+    echo $php_pid >> $PIDFILE_HTTP
+    echo "Started simplesaml with PID $php_pid" >> $CTL_LOG
     ;;
 
   stop)
-    kill `cat $PIDFILE_HTTP`
+    pidfile_pid="$(cat "${PIDFILE_HTTP}")"
+    echo "Killing '$pidfile_pid' from '$PIDFILE_HTTP'" >> $CTL_LOG
+    kill $pidfile_pid 2>&1 >> $CTL_LOG
     rm -f $PIDFILE_HTTP
 
+    simplesaml_pid="$(ps -ef | grep simplesaml | grep -v grep | awk '{print $2}')"
+    if [[ ! -z "$simplesaml_pid" ]]; then
+      echo "Killing process 'simplesaml' found at PID '$simplesaml_pid'" >> $CTL_LOG
+      kill $simplesaml_pid 2>&1 >> $CTL_LOG
+    fi
+
+    echo 'Killed simplesaml' >> $CTL_LOG
     ;;
 
   *)
