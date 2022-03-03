@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 RUN_DIR=/var/vcap/sys/run/simplesaml
 LOG_DIR=/var/vcap/sys/log/simplesaml
@@ -6,53 +7,60 @@ PIDFILE_HTTP=${RUN_DIR}/pid_http
 CTL_LOG="${LOG_DIR}/ctl.log"
 PHP_LOG="${LOG_DIR}/php.log"
 
-if [[ `which php` ]]; then
-    echo 'PHP is already installed' >> $CTL_LOG
-else
-    echo 'Installing PHP' >> $CTL_LOG
-    apt-get update 2>&1 >> $CTL_LOG
-    apt-get install php php-xml php-curl php-gmp -y 2>&1 >> $CTL_LOG
-    echo 'DONE - Installing PHP' >> $CTL_LOG
-fi
+ensure_php() {
+  echo "Ensuring PHP" >> $CTL_LOG
+  if ! command -v php >/dev/null; then
+    # shellcheck disable=SC2129
+    echo "Installing PHP" >> $CTL_LOG
+    apt-get update >> $CTL_LOG 2>&1
+    apt-get install php php-xml php-curl php-gmp -y >> $CTL_LOG 2>&1
+  else
+    echo "PHP is already installed" >> $CTL_LOG
+  fi
+  echo "DONE - Ensuring PHP" >> $CTL_LOG
+}
 
 case $1 in
 
   start)
-    echo 'Copying metadata' >> $CTL_LOG
-    cp /var/vcap/jobs/simplesaml/metadata/saml20-sp-remote.php \
-      /var/vcap/packages/simplesaml/metadata/saml20-sp-remote.php
-    echo 'DONE - Copying metadata' >> $CTL_LOG
+    ensure_php
+    echo "Copying metadata" >> $CTL_LOG
+    cp -v \
+      /var/vcap/jobs/simplesaml/metadata/saml20-sp-remote.php \
+      /var/vcap/packages/simplesaml/metadata/saml20-sp-remote.php >> $CTL_LOG 2>&1
+    echo "DONE - Copying metadata" >> $CTL_LOG
 
-    echo 'Setting up "$RUN_DIR", "$LOG_DIR"' >> $CTL_LOG
-    mkdir -p $RUN_DIR $LOG_DIR
-    chown -R vcap:vcap $RUN_DIR $LOG_DIR
-    echo 'DONE - Setting up "$RUN_DIR", "$LOG_DIR"' >> $CTL_LOG
+    echo "Setting up '$RUN_DIR', '$LOG_DIR'" >> $CTL_LOG
+    mkdir -p $RUN_DIR $LOG_DIR >> $CTL_LOG 2>&1
+    chown -R vcap:vcap $RUN_DIR $LOG_DIR >> $CTL_LOG 2>&1
+    echo "DONE - Setting up '$RUN_DIR', '$LOG_DIR'" >> $CTL_LOG
 
-    echo 'Starting PHP simplesaml' >> $CTL_LOG
+    echo "Starting PHP simplesaml" >> $CTL_LOG
     php -S 0.0.0.0:80 \
       -t /var/vcap/packages/simplesaml/www \
       -c /var/vcap/jobs/simplesaml/php.ini \
-      2>&1 >> $PHP_LOG &
+      >> $PHP_LOG 2>&1 &
     php_pid="$!"
     echo $php_pid > $PIDFILE_HTTP
-    echo "DONE - Starting PHP simplesaml with PID $php_pid" >> $CTL_LOG
+    echo "DONE - Starting PHP simplesaml, wrote PID '$php_pid'" >> $CTL_LOG
     ;;
 
   stop)
     pidfile_pid="$(cat "${PIDFILE_HTTP}")"
     echo "Killing '$pidfile_pid' from '$PIDFILE_HTTP'" >> $CTL_LOG
-    kill $pidfile_pid 2>&1 >> $CTL_LOG
+    kill "$pidfile_pid" >> $CTL_LOG 2>&1
     echo "DONE - Killing '$pidfile_pid' from '$PIDFILE_HTTP'" >> $CTL_LOG
 
     echo "Removing '$PIDFILE_HTTP'" >> $CTL_LOG
     rm -f $PIDFILE_HTTP
     echo "DONE - Removing '$PIDFILE_HTTP'" >> $CTL_LOG
 
-    simplesaml_pid="$(ps -ef | grep simplesaml | grep -v grep | awk '{print $2}')"
-    if [[ ! -z "$simplesaml_pid" ]]; then
-      echo "Killing process 'simplesaml' found at PID '$simplesaml_pid'" >> $CTL_LOG
-      kill $simplesaml_pid 2>&1 >> $CTL_LOG
-      echo "DONE - Killing process 'simplesaml' found at PID '$simplesaml_pid'" >> $CTL_LOG
+    pgrep_pid="$(pgrep -a php | grep simplesaml | awk '{print $1}')"
+    if [[ -n "$pgrep_pid" ]]; then
+      # shellcheck disable=SC2129
+      echo "Killing process 'simplesaml' found at PID '$pgrep_pid'" >> $CTL_LOG
+      kill "$pgrep_pid" >> $CTL_LOG 2>&1
+      echo "DONE - Killing process 'simplesaml' found at PID '$pgrep_pid'" >> $CTL_LOG
     fi
     ;;
 
