@@ -8,59 +8,59 @@ CTL_LOG="${LOG_DIR}/ctl.log"
 PHP_LOG="${LOG_DIR}/php.log"
 
 ensure_php() {
-  echo "Ensuring PHP" >> $CTL_LOG
+  echo "$(date -uIseconds) Ensuring PHP" >> $CTL_LOG
   if ! command -v php >/dev/null; then
     # shellcheck disable=SC2129
-    echo "Installing PHP" >> $CTL_LOG
+    echo "$(date -uIseconds) Installing PHP" >> $CTL_LOG
     apt-get update >> $CTL_LOG 2>&1
     apt-get install php php-xml php-curl php-gmp -y >> $CTL_LOG 2>&1
   else
-    echo "PHP is already installed" >> $CTL_LOG
+    echo "$(date -uIseconds) PHP is already installed" >> $CTL_LOG
   fi
-  echo "DONE - Ensuring PHP" >> $CTL_LOG
+  echo "$(date -uIseconds) DONE - Ensuring PHP" >> $CTL_LOG
 }
 
 case $1 in
 
   start)
     ensure_php
-    echo "Copying metadata" >> $CTL_LOG
+    echo "$(date -uIseconds) Copying metadata" >> $CTL_LOG
     cp -v \
       /var/vcap/jobs/simplesaml/metadata/saml20-sp-remote.php \
       /var/vcap/packages/simplesaml/metadata/saml20-sp-remote.php >> $CTL_LOG 2>&1
-    echo "DONE - Copying metadata" >> $CTL_LOG
+    echo "$(date -uIseconds) DONE - Copying metadata" >> $CTL_LOG
 
-    echo "Setting up '$RUN_DIR', '$LOG_DIR'" >> $CTL_LOG
+    echo "$(date -uIseconds) Setting up '$RUN_DIR', '$LOG_DIR'" >> $CTL_LOG
     mkdir -p $RUN_DIR $LOG_DIR >> $CTL_LOG 2>&1
     chown -R vcap:vcap $RUN_DIR $LOG_DIR >> $CTL_LOG 2>&1
-    echo "DONE - Setting up '$RUN_DIR', '$LOG_DIR'" >> $CTL_LOG
+    echo "$(date -uIseconds) DONE - Setting up '$RUN_DIR', '$LOG_DIR'" >> $CTL_LOG
 
-    echo "Starting PHP simplesaml" >> $CTL_LOG
+    echo "$(date -uIseconds) Starting PHP simplesaml" >> $CTL_LOG
     php -S 0.0.0.0:80 \
       -t /var/vcap/packages/simplesaml/www \
       -c /var/vcap/jobs/simplesaml/php.ini \
       >> $PHP_LOG 2>&1 &
     php_pid="$!"
     echo $php_pid > $PIDFILE_HTTP
-    echo "DONE - Starting PHP simplesaml, wrote PID '$php_pid'" >> $CTL_LOG
+    echo "$(date -uIseconds) DONE - Starting PHP simplesaml, wrote PID '$php_pid'" >> $CTL_LOG
     ;;
 
   stop)
     pidfile_pid="$(cat "${PIDFILE_HTTP}")"
-    echo "Killing '$pidfile_pid' from '$PIDFILE_HTTP'" >> $CTL_LOG
+    echo "$(date -uIseconds) Killing '$pidfile_pid' from '$PIDFILE_HTTP'" >> $CTL_LOG
     kill "$pidfile_pid" >> $CTL_LOG 2>&1
-    echo "DONE - Killing '$pidfile_pid' from '$PIDFILE_HTTP'" >> $CTL_LOG
+    echo "$(date -uIseconds) DONE - Killing '$pidfile_pid' from '$PIDFILE_HTTP'" >> $CTL_LOG
 
-    echo "Removing '$PIDFILE_HTTP'" >> $CTL_LOG
+    echo "$(date -uIseconds) Removing '$PIDFILE_HTTP'" >> $CTL_LOG
     rm -f $PIDFILE_HTTP
-    echo "DONE - Removing '$PIDFILE_HTTP'" >> $CTL_LOG
+    echo "$(date -uIseconds) DONE - Removing '$PIDFILE_HTTP'" >> $CTL_LOG
 
     pgrep_pid="$(pgrep -a php | grep simplesaml | awk '{print $1}')"
     if [[ -n "$pgrep_pid" ]]; then
       # shellcheck disable=SC2129
-      echo "Killing process 'simplesaml' found at PID '$pgrep_pid'" >> $CTL_LOG
+      echo "$(date -uIseconds) Killing process 'simplesaml' found at PID '$pgrep_pid'" >> $CTL_LOG
       kill "$pgrep_pid" >> $CTL_LOG 2>&1
-      echo "DONE - Killing process 'simplesaml' found at PID '$pgrep_pid'" >> $CTL_LOG
+      echo "$(date -uIseconds) DONE - Killing process 'simplesaml' found at PID '$pgrep_pid'" >> $CTL_LOG
     fi
     ;;
 
