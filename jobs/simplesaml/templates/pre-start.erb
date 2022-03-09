@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "$(date -uIseconds) Installing PHP"
+if ! command -v php >/dev/null; then
+  echo "$(date -uIseconds) Installing PHP"
+  apt-get update 2>&1
+  apt-get install php php-xml php-curl php-gmp -y 2>&1
+else
+  echo "$(date -uIseconds) PHP is already installed"
+fi
+echo "$(date -uIseconds) DONE - Installing PHP"

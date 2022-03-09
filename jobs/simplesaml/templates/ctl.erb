@@ -7,23 +7,9 @@ PIDFILE_HTTP=${RUN_DIR}/pid_http
 CTL_LOG="${LOG_DIR}/ctl.log"
 PHP_LOG="${LOG_DIR}/php.log"
 
-ensure_php() {
-  echo "$(date -uIseconds) Ensuring PHP" >> $CTL_LOG
-  if ! command -v php >/dev/null; then
-    # shellcheck disable=SC2129
-    echo "$(date -uIseconds) Installing PHP" >> $CTL_LOG
-    apt-get update >> $CTL_LOG 2>&1
-    apt-get install php php-xml php-curl php-gmp -y >> $CTL_LOG 2>&1
-  else
-    echo "$(date -uIseconds) PHP is already installed" >> $CTL_LOG
-  fi
-  echo "$(date -uIseconds) DONE - Ensuring PHP" >> $CTL_LOG
-}
-
 case $1 in
 
   start)
-    ensure_php
     echo "$(date -uIseconds) Copying metadata" >> $CTL_LOG
     cp -v \
       /var/vcap/jobs/simplesaml/metadata/saml20-sp-remote.php \
