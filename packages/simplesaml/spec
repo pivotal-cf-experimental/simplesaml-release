@@ -5,3 +5,4 @@ dependencies: []
 
 files:
 - simplesamlphp-for-cf/**/*
+- add-post-binding.patch
