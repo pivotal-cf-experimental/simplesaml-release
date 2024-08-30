@@ -9,3 +9,8 @@ else
   echo "$(date -uIseconds) PHP is already installed"
 fi
 echo "$(date -uIseconds) DONE - Installing PHP"
+
+echo "$(date -uIseconds) Disabling Apache"
+systemctl stop apache2
+systemctl disable apache2
+echo "$(date -uIseconds) DONE - Disabling Apache"
