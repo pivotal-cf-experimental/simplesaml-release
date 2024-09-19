@@ -1,4 +1,5 @@
 private.yml
 .dev_builds/
 dev_releases/
+blobs/
 /*.tgz

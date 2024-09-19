@@ -3,14 +3,33 @@ name: simplesaml
 
 templates:
     ctl.erb: bin/ctl
+    config/acl.php.erb: config/acl.php
+    config/authsources.php.erb: config/authsources.php
+    config/config.php.erb: config/config.php
+    metadata/saml20-idp-hosted.php.erb: metadata/saml20-idp-hosted.php
+    metadata/saml20-sp-remote.php.erb: metadata/saml20-sp-remote.php
     pre-start.erb: bin/pre-start
     php.ini.erb: php.ini
-    saml20-sp-remote.php.erb: metadata/saml20-sp-remote.php
+    server.crt.erb: server.crt
+    server.pem.erb: server.pem
 
 packages:
 - simplesaml
 
 properties:
+    admin_password:
+        description: The admin password for the SimpleSAML instance
     permitted_client_ip_addresses:
         description: IP adddresses to allow to connect with the SAML server
         default: []
+    user_group_attribute:
+        description: SAML attribute returned for the groups of a user
+    users:
+        description: An array of users to configure. Must include 'username', 'password', 'email', and 'groups' fields
+        default: []
+    salt:
+        description: The secret salt used by SimpleSAML
+    idp.certificate:
+        description: TLS certificate used to identify the SimpleSAML IDP. It is *not* a TLS certificate in front of the SimpleSAML server.
+    idp.private_key:
+        description: TLS private key used to identify the SimpleSAML IDP.

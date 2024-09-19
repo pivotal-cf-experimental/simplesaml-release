@@ -4,5 +4,4 @@ name: simplesaml
 dependencies: []
 
 files:
-- simplesamlphp-for-cf/**/*
-- add-post-binding.patch
+- simplesamlphp-*-full.tar.gz

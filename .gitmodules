@@ -1,3 +1,0 @@
-[submodule "src/simplesamlphp-for-cf"]
-	path = src/simplesamlphp-for-cf
-	url = git@github.com:pivotal-cf-experimental/simplesamlphp-for-cf.git

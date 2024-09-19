@@ -2,6 +2,7 @@
 
 set -e
 
-cp -r simplesamlphp-for-cf/* "${BOSH_INSTALL_TARGET}"
+version="$(cut -d- -f2 <<< "$(ls simplesamlphp*-full.tar.gz)")"
 
-patch -p1 -u -d "${BOSH_INSTALL_TARGET}" < add-post-binding.patch
+tar xvf "simplesamlphp-${version}-full.tar.gz"
+cp -r simplesamlphp-$version/* "${BOSH_INSTALL_TARGET}"

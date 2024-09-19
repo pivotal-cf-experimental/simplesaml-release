@@ -12,8 +12,8 @@ case $1 in
   start)
     echo "$(date -uIseconds) Copying metadata" >> $CTL_LOG
     cp -v \
-      /var/vcap/jobs/simplesaml/metadata/saml20-sp-remote.php \
-      /var/vcap/packages/simplesaml/metadata/saml20-sp-remote.php >> $CTL_LOG 2>&1
+      /var/vcap/jobs/simplesaml/metadata/*.php \
+      /var/vcap/packages/simplesaml/metadata/ >> $CTL_LOG 2>&1
     echo "$(date -uIseconds) DONE - Copying metadata" >> $CTL_LOG
 
     echo "$(date -uIseconds) Setting up '$RUN_DIR', '$LOG_DIR'" >> $CTL_LOG
@@ -22,10 +22,13 @@ case $1 in
     echo "$(date -uIseconds) DONE - Setting up '$RUN_DIR', '$LOG_DIR'" >> $CTL_LOG
 
     echo "$(date -uIseconds) Starting PHP simplesaml" >> $CTL_LOG
+
+    SIMPLESAMLPHP_CONFIG_DIR=/var/vcap/jobs/simplesaml/config/ \
     php -S 0.0.0.0:80 \
-      -t /var/vcap/packages/simplesaml/www \
+      -t /var/vcap/packages/simplesaml/public \
       -c /var/vcap/jobs/simplesaml/php.ini \
       >> $PHP_LOG 2>&1 &
+
     php_pid="$!"
     echo $php_pid > $PIDFILE_HTTP
     echo "$(date -uIseconds) DONE - Starting PHP simplesaml, wrote PID '$php_pid'" >> $CTL_LOG
