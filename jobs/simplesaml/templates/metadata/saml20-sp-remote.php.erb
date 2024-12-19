@@ -7,19 +7,19 @@
  */
 
 <% p('permitted_client_ip_addresses').each do |ip_address| %>
-    $metadata['https://<%= ip_address %>:443/uaa'] = array(
+    $metadata['https://<%= ip_address %>/uaa'] = array(
         'AssertionConsumerService' => [
             [
                 'index' => 1,
                 'isDefault' => true,
-                'Location' => 'https://<%= ip_address %>:443/uaa/saml/SSO/alias/<%= ip_address %>',
+                'Location' => 'https://<%= ip_address %>/uaa/saml/SSO/alias/<%= ip_address %>',
                 'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
             ],
         ],
         'SingleLogoutService' => [
             [
-                'Location' => 'https://<%= ip_address %>:443/uaa/saml/SSO/alias/<%= ip_address %>',
-                'ResponseLocation' => 'https://<%= ip_address %>:443/uaa/saml/SSO/alias/<%= ip_address %>',
+                'Location' => 'https://<%= ip_address %>/uaa/saml/SSO/alias/<%= ip_address %>',
+                'ResponseLocation' => 'https://<%= ip_address %>/uaa/saml/SSO/alias/<%= ip_address %>',
                 'Binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
             ]
         ],
